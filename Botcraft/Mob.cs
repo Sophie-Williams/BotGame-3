@@ -11,88 +11,9 @@ namespace Botcraft
         //Read-only values
 
         private int[] baseStats = new int[Stats.GetNames(typeof(Stats)).Length];
-        //Stats - Base
+        // see Public Method getStat(Stats stat)
       
-        public int getStat(Stats stat)
-        {
-            int output = baseStats[(int)stat];
-            foreach (Equipment slot in equipArray)
-            {
-                if (slot != null)
-                {
-                    output += slot.statBonus[(int)stat]; 
-                }
-            }
-            return output;
-        }
-        // Stats - Calculated from base and all equipped items
-  /*      public int speed 
-        { 
-            get 
-            { 
-                int output = 
-                    _speed;
-                foreach (Equipment slot in equipArray)
-                {
-                    if (slot != null)
-                        output += slot.speed;
-                }
-                return output;
-            }
-        }
-        public int attackPower
-        {
-            get
-            {
-                int output = _attackPower;
-                foreach (Equipment slot in equipArray)
-                {
-                    if (slot != null)
-                        output += slot.attackPower;
-                }
-                return output;
-            }
-        }
-        public int scanRadius
-        {
-            get
-            {
-                int output = _scanRadius;
-                foreach (Equipment slot in equipArray)
-                {
-                    if(slot != null)
-                        output += slot.scanRadius;
-                }
-                return output;
-            }
-        }
-        public int minePower
-        {
-            get
-            {
-                int output = _minePower;
-                foreach (Equipment slot in equipArray)
-                {
-                    if (slot != null)
-                        output += slot.minePower;
-                }
-                return output;
-            }
-        }
-        public int maxCapacity
-        {
-            get
-            {
-                int output = _maxCapacity;
-                foreach (Equipment slot in equipArray)
-                {
-                    if (slot != null)
-                        output += slot.maxCapacity;
-                }
-                return output;
-            }
-        }
-     */   
+
         
         //Other
         public int x { get; private set; }
@@ -148,6 +69,18 @@ namespace Botcraft
 
 
         //Public Methods
+        public int getStat(Stats stat)
+        {
+            int output = baseStats[(int)stat];
+            foreach (Equipment slot in equipArray)
+            {
+                if (slot != null)
+                {
+                    output += slot.statBonus[(int)stat]; 
+                }
+            }
+            return output;
+        }
         public void tick()
         {
             MobCmd cmdToExec = MobCmd.Empty;
