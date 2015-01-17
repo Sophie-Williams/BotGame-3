@@ -6,28 +6,27 @@ using System.Threading.Tasks;
 
 namespace Botcraft
 {
-    enum MobCmd
-	{
-        MoveNorth, MoveSouth, MoveEast, MoveWest, MoveUp, MoveDown,
-        ActNorth, ActSouth, ActEast, ActWest, ActUp, ActDown,
-        GetItems, Empty, Idle, Scan, Quit, Pause
-	}
-    
-    enum EquipLoc { Body, Tool, Battery, Trinket1, Trinket2 }
-    
     class Mob
     {
         //Read-only values
 
+        private int[] baseStats = new int[Stats.GetNames(typeof(Stats)).Length];
         //Stats - Base
-        private int _speed;
-        private int _attackPower;
-        private int _scanRadius;
-        private int _minePower;
-        private int _maxCapacity;
-
+      
+        public int getStat(Stats stat)
+        {
+            int output = baseStats[(int)stat];
+            foreach (Equipment slot in equipArray)
+            {
+                if (slot != null)
+                {
+                    output += slot.statBonus[(int)stat]; 
+                }
+            }
+            return output;
+        }
         // Stats - Calculated from base and all equipped items
-        public int speed 
+  /*      public int speed 
         { 
             get 
             { 
@@ -93,7 +92,7 @@ namespace Botcraft
                 return output;
             }
         }
-        
+     */   
         
         //Other
         public int x { get; private set; }
@@ -101,7 +100,7 @@ namespace Botcraft
         public int z { get; private set; }
         public String name { get; private set; }
         public char dispChar { get; private set; }
-        public char[,] scanData { get; private set; }
+        public char[,,] scanData { get; private set; }
         
         //Constructors & Related Methods
         public Mob(Level[] world, char avatar) : this(world, 0,0,0, avatar, "Bot") { }
@@ -113,7 +112,16 @@ namespace Botcraft
             y = startY;
             z = startZ;
             dispChar = avatar;
-            setStats(3, 3, 0, 0, 30);
+            setStats(new [] 
+            { 
+                30, //HP
+                0,  //Armor
+                3,  //Speed
+                3,  //ScanRadius
+                0,  //AttackPower
+                0,  //MinePower
+                30  //MaxCapacity
+            });
             //DEBUG
             cmdQueue = testQueue;
             //END DEBUG
@@ -121,13 +129,12 @@ namespace Botcraft
             theWorld[z].map[x, y].enter(this);
         }
         
-        private void setStats(int setSpeed, int setScan, int setMine, int setAttack, int newMaxCap)
+        private void setStats(int[] statBlock)
         {
-            _speed = setSpeed;
-            _scanRadius = setScan;
-            _minePower = setMine;
-            _attackPower = setAttack;
-            _maxCapacity = newMaxCap;
+            for (int i = 0; i < Enum.GetNames(typeof (Stats)).Length; i++)
+            {
+                baseStats[i] = statBlock[i];
+            }
         }
         
         //Private Data
@@ -191,7 +198,7 @@ namespace Botcraft
                 return;
             else
             {
-                if(inventory.Count < maxCapacity)   //inventory is not full
+                if(inventory.Count < getStat(Stats.MaxCapacity))   //inventory is not full
                 {
                     inventory.Add(equipArray[(int)location]);
                     equipArray[(int)location] = null;
@@ -226,35 +233,59 @@ namespace Botcraft
         }
         private void scan()
         {
-            scanData = new char[2 * scanRadius + 1, 2 * scanRadius + 1];
+            int scanRadius = getStat(Stats.ScanRadius);
+            scanData = new char[3, 2 * scanRadius + 1, 2*scanRadius+1];
             Console.WriteLine("--Scanning--");
             int scanX = 0;
             int scanY = 0;
-            for (int targetX = x - scanRadius; targetX <= x + scanRadius; targetX++)
+            int scanZ = 0;
+            for (int targetZ = z - 1; targetZ <= z + 1; targetZ++)
             {
-                for (int targetY = y - scanRadius; targetY <= y + scanRadius; targetY++)
+                for (int targetX = x - scanRadius; targetX <= x + scanRadius; targetX++)
                 {
-                    if (targetX > 0 && targetX < Game.MAP_HEIGHT && targetY > 0 && targetY < Game.MAP_WIDTH)
-                        scanData[scanX, scanY] = theWorld[z].map[targetX, targetY].getDispChar();
-                    else
-                        scanData[scanX, scanY] = '#';
-                    Console.Write(scanData[scanX, scanY]);
-                    scanY++;
+                    for (int targetY = y - scanRadius; targetY <= y + scanRadius; targetY++)
+                    {
+                        if (targetZ < 0 || targetZ > Game.MAP_DEPTH)
+                        {
+                            scanData[scanZ, scanX, scanY] = '_';
+                            Console.Write(scanData[scanZ, scanX, scanY]);
+                            scanY++;
+                            continue;
+                        }
+                        if (targetX > 0 && targetX < Game.MAP_HEIGHT && targetY > 0 && targetY < Game.MAP_WIDTH)
+                            scanData[scanZ, scanX, scanY] = theWorld[targetZ].map[targetX, targetY].getDispChar();
+                        else
+                            scanData[scanZ, scanX, scanY] = '#';
+                        Console.Write(scanData[scanZ, scanX, scanY]);
+                        scanY++;
+                    }
+                    Console.Write("\n");
+                    scanX++;
+                    scanY = 0;
                 }
-                Console.Write("\n");
-                scanX++;
-                scanY = 0;
+                Console.Write('\n');
+                scanZ++;
+                scanX = 0;
             }
             Console.WriteLine("--End Scan--");
         }
         private void moveTo(int newX, int newY, int depth)
         {
-            if (theWorld[depth].map[newX, newY].enter(this))
+            //try to move to the location
+            if (theWorld[depth].map[newX, newY].enter(this))    //returns false if space is occupied by a mob or block
             {
                 theWorld[z].map[x, y].leave();
                 this.x = newX;
                 this.y = newY;
                 this.z = depth;
+            }
+            if (theWorld[z+1].map[x,y].isMovable())
+            {
+                if (cmdStack == null)
+                {
+                    cmdStack = new Stack<MobCmd>();
+                }
+                cmdStack.Push(MobCmd.MoveDown);     //Fall if possible; 
             }
         }
         private void doCmd(MobCmd cmd)

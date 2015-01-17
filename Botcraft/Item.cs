@@ -23,47 +23,22 @@ namespace Botcraft
     class Equipment : Item
     {
         //Public Data
-        public int speed { get; private set; }
-        public int scanRadius { get; private set; }  
-        public int minePower { get; private set; }   
-        public int attackPower { get; private set; } 
-        public int maxCapacity { get;  private set; }
-        
-
-
+        public int[] statBonus = new int[Enum.GetNames(typeof(Stats)).Length];
+        public bool[] fitsSlot = new bool[Enum.GetNames(typeof(EquipLoc)).Length];
         //Constructors
-        public Equipment(String newName, bool battery, bool body, bool tool, bool trinket)
+        public Equipment(String newName, bool[] slots, int[] stats)
             : base(newName, 1)
         {
-            fitsBattery = battery;
-            fitsBody = body;
-            fitsTool = tool;
-            fitsTrinket = trinket;
+            for (int i = 0; i < Enum.GetNames(typeof(EquipLoc)).Length; i++)
+            {
+                fitsSlot[i] = slots[i];
+            }
         }
-        //Private Data
-        private bool fitsBody;
-        private bool fitsTool;
-        private bool fitsBattery;
-        private bool fitsTrinket;
-
+       
         //Public Methods
         public bool fits(EquipLoc slot)
         {
-            switch (slot)
-            {
-                case EquipLoc.Body:
-                    return fitsBody;
-                case EquipLoc.Tool:
-                    return fitsTool;
-                case EquipLoc.Battery:
-                    return fitsBattery;
-                case EquipLoc.Trinket1:
-                case EquipLoc.Trinket2:
-                    return fitsTrinket;
-                default:
-                    return false;
-
-            }
+            return fitsSlot[(int)slot];
         }    
 
     }

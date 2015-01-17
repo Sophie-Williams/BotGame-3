@@ -11,9 +11,9 @@ namespace Botcraft
         //Public Members
         public const int MAP_HEIGHT = 20;
         public const int MAP_WIDTH = 20;
-        public const int MAX_DEPTH = 5;
+        public const int MAP_DEPTH = 5;
         public List<Mob> moblist = new List<Mob>();
-        public static Level[] floors = new Level[MAX_DEPTH];
+        public static Level[] floors = new Level[MAP_DEPTH];
                         
         //Constructor
         public Game()
@@ -39,7 +39,7 @@ namespace Botcraft
             floors[0] = new Level(0, new BlockID[] { BlockID.Air, BlockID.Dirt });
             floors[0].showMap();
             Console.WriteLine("Floor: 0");
-            for (int i = 1; i < MAX_DEPTH; i++)
+            for (int i = 1; i < MAP_DEPTH; i++)
     		    {
                     floors[i] = new Level(i, new BlockID[] { BlockID.Stone, BlockID.Dirt });
                     floors[i].showMap();

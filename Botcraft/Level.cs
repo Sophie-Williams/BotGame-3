@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Botcraft
 {
-    enum BlockID { Air, Dirt, Stone, Wall }
-
+    
     class BlockSpace
     {
         public Block block;
