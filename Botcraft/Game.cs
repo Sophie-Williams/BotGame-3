@@ -46,7 +46,7 @@ namespace Botcraft
                     Console.WriteLine("Floor: " + i);
 			    }
             
-            moblist.Add(new Mob(floors, 0, 10, 10, '$',"Rob"));
+            moblist.Add(new Mob(floors, 0, 2, 2, '$', ConsoleColor.Green, "Rob"));
             
         }
 

@@ -21,11 +21,12 @@ namespace Botcraft
         public int z { get; private set; }
         public String name { get; private set; }
         public char dispChar { get; private set; }
+        public ConsoleColor dispColor { get; set; }
         public char[,,] scanData { get; private set; }
         
         //Constructors & Related Methods
-        public Mob(Level[] world, char avatar) : this(world, 0,0,0, avatar, "Bot") { }
-        public Mob(Level[] world, int startZ, int startX, int startY, char avatar, String newName)
+        public Mob(Level[] world, char avatar, ConsoleColor color) : this(world, 0,0,0, avatar, color, "Bot") { }
+        public Mob(Level[] world, int startZ, int startX, int startY, char avatar, ConsoleColor color, String newName)
         {
             name = newName;
             theWorld = world;
@@ -33,6 +34,7 @@ namespace Botcraft
             y = startY;
             z = startZ;
             dispChar = avatar;
+            dispColor = color;
             setStats(new [] 
             { 
                 30, //HP
@@ -101,8 +103,19 @@ namespace Botcraft
             {
                 doCmd(cmdToExec);
             }
-            getAiInput();
+            
+            addCmds(getAiInput());
+            showQueue();
+            
+        }
 
+        private void showQueue()
+        {
+            foreach (var cmd in cmdQueue)
+            {
+                Console.Write(cmd + ", ");
+            }
+            Console.WriteLine();
         }
         public bool addCmd(MobCmd newCmd)
         {
@@ -114,7 +127,12 @@ namespace Botcraft
         }
         public void addCmds(Queue<MobCmd> incoming)
         {
-            cmdQueue.Concat(incoming);
+            if (incoming == null) { return; }
+            while (incoming.Count > 0)
+            {
+
+                cmdQueue.Enqueue(incoming.Dequeue());
+            }
         }
         public void addCmds(Stack<MobCmd> incoming)
         {
@@ -161,7 +179,11 @@ namespace Botcraft
         private Queue<MobCmd> getAiInput(/*TODO: Implement AI*/)
         {
             if (cmdQueue.Count == 0)
-                return new Queue<MobCmd>(new[] { MobCmd.Idle, MobCmd.Scan });
+            {
+
+                Queue<MobCmd> newQueue = new Queue<MobCmd>(new[] { MobCmd.Idle, MobCmd.Scan, MobCmd.Pause });
+                return newQueue;
+            }
             else return null;
         }
         private void scan()
@@ -174,21 +196,40 @@ namespace Botcraft
             int scanZ = 0;
             for (int targetZ = z - 1; targetZ <= z + 1; targetZ++)
             {
+                
                 for (int targetX = x - scanRadius; targetX <= x + scanRadius; targetX++)
                 {
                     for (int targetY = y - scanRadius; targetY <= y + scanRadius; targetY++)
                     {
                         if (targetZ < 0 || targetZ > Game.MAP_DEPTH)
                         {
-                            scanData[scanZ, scanX, scanY] = '_';
+                            scanData[scanZ, scanX, scanY] = '#';
+                            switch (scanZ)
+                            {
+                                case 0:
+                                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                                    break;
+                                case 2:
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    break;
+                                default:
+                                    Console.ForegroundColor = ConsoleColor.Magenta; //should never happen
+                                    break;
+                            }
                             Console.Write(scanData[scanZ, scanX, scanY]);
                             scanY++;
                             continue;
                         }
-                        if (targetX > 0 && targetX < Game.MAP_HEIGHT && targetY > 0 && targetY < Game.MAP_WIDTH)
+                        if (targetX >= 0 && targetX <= Game.MAP_HEIGHT && targetY >= 0 && targetY <= Game.MAP_WIDTH)
+                        {
                             scanData[scanZ, scanX, scanY] = theWorld[targetZ].map[targetX, targetY].getDispChar();
+                            Console.ForegroundColor = theWorld[targetZ].map[targetX, targetY].getDispColor();
+                        }
                         else
+                        {
                             scanData[scanZ, scanX, scanY] = '#';
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                        }
                         Console.Write(scanData[scanZ, scanX, scanY]);
                         scanY++;
                     }
@@ -269,7 +310,6 @@ namespace Botcraft
                     break;
                 case MobCmd.Pause:
                     Console.WriteLine("Breakpoint");
-                    Console.WriteLine("");
                     break;
                 case MobCmd.Quit:
                     Console.WriteLine("QUIT");

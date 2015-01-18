@@ -22,7 +22,15 @@ namespace Botcraft
             mob = null;
         }
 
-
+        public ConsoleColor getDispColor()
+        {
+            if (mob != null)
+            {
+                return mob.dispColor;
+            }
+            else
+                return block.dispColor; 
+        }
         public char getDispChar()
         { 
             if (mob != null) 
@@ -101,10 +109,12 @@ namespace Botcraft
             {
                 for (int j = 0; j < Game.MAP_WIDTH; j++)
                 {
+                    Console.ForegroundColor = map[i, j].getDispColor();
                     Console.Write(map[i,j].getDispChar());
                 }
                 Console.Write("\n");
             }
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         //Private Methods
