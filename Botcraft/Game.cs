@@ -19,6 +19,7 @@ namespace Botcraft
         public Game()
         {
             init();
+            basicTest();
         }
 
         //Public Methods
@@ -46,10 +47,15 @@ namespace Botcraft
                     Console.WriteLine("Floor: " + i);
 			    }
             
-            moblist.Add(new Mob(floors, 0, 2, 2, '$', ConsoleColor.Green, "Rob"));
             
         }
 
+        private void basicTest()
+        {
+            Queue<MobCmd> testQueue = new Queue<MobCmd>(new MobCmd[] {MobCmd.MoveWest, MobCmd.MoveSouth, MobCmd.Scan, MobCmd.MoveEast, MobCmd.MoveNorth, MobCmd.Pause, MobCmd.Pause });
+            moblist.Add(new Mob(floors, 0, 2, 2, '$', ConsoleColor.Green, "Rob", testQueue));
+
+        }
 
     }
 }

@@ -25,8 +25,7 @@ namespace Botcraft
         public char[,,] scanData { get; private set; }
         
         //Constructors & Related Methods
-        public Mob(Level[] world, char avatar, ConsoleColor color) : this(world, 0,0,0, avatar, color, "Bot") { }
-        public Mob(Level[] world, int startZ, int startX, int startY, char avatar, ConsoleColor color, String newName)
+        public Mob(Level[] world, int startZ, int startX, int startY, char avatar, ConsoleColor color, String newName, Queue<MobCmd> initQueue)
         {
             name = newName;
             theWorld = world;
@@ -46,7 +45,7 @@ namespace Botcraft
                 30  //MaxCapacity
             });
             //DEBUG
-            cmdQueue = testQueue;
+            cmdQueue = initQueue;
             //END DEBUG
 
             theWorld[z].map[x, y].enter(this);
@@ -67,7 +66,6 @@ namespace Botcraft
         private List<Item> inventory;
         private Stack<MobCmd> cmdStack;
         private Queue<MobCmd> cmdQueue;
-        private Queue<MobCmd> testQueue = new Queue<MobCmd>(new MobCmd[] {MobCmd.MoveWest, MobCmd.MoveSouth, MobCmd.Scan, MobCmd.MoveEast, MobCmd.MoveNorth, MobCmd.Pause, MobCmd.Pause });
 
 
         //Public Methods
