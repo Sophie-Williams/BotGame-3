@@ -143,19 +143,20 @@ namespace Botcraft
             while (quantityToAdd > 0)
             {
                 // See if the mob already has that item in its inventory and if there's room to stack more
-                if (inventory.Exists(r => (r.item != null) && (r.item == newItem) && (r.quantity < newItem.maxQuantity)))
+                if (inventory.Exists(r => (r.item != null) && (r.item.id == newItem.id) && (r.quantity < newItem.maxQuantity)))
                 {
-                    ItemRecord target = inventory.First(x => (x.item == newItem) && (x.quantity < newItem.maxQuantity));
+                    ItemRecord target = inventory.First(x => (x.item.id == newItem.id) && (x.quantity < newItem.maxQuantity));
 
                     //how many more we can stack
                     int maxToAdd = newItem.maxQuantity - target.quantity;
 
                     //add to the stack without overflowing
                     int deltaQ = Math.Min(quantityToAdd, maxToAdd);
-                    target.alterQuantity(deltaQ);
-
+                    target.quantity += deltaQ;
+                    
                     quantityToAdd -= deltaQ;
                     leftoverItemCount -= deltaQ;
+                    
                 } 
                 else
                 {
@@ -173,7 +174,7 @@ namespace Botcraft
                     }
                 }
             }
-            return 0;
+            return 0;   // No leftovers
         }
         public void unequip(EquipLoc location)
         {
@@ -190,7 +191,7 @@ namespace Botcraft
         {
             if(!item.fits(location))
             {
-                Console.WriteLine("{0} doesn't fit {1}!", item.name, location);
+                Console.WriteLine("{0} doesn't fit {1}!", item.id, location);
                 return; 
             }
 
@@ -324,12 +325,14 @@ namespace Botcraft
                 case MobCmd.Idle:
                     break;
                 case MobCmd.GetItems:
-                    foreach (ItemRecord index in theWorld[z].map[x,y].items)
-                    {
+                    int available;
+                    ItemRecord[] blockItemArray = theWorld[z].map[x, y].items.ToArray();
+                    foreach (ItemRecord index in blockItemArray)
+                    {                        
                         Console.Write(" | ");
-                        int leftovers = addItems(index.item, index.quantity);
-                        index.alterQuantity(leftovers - index.quantity);
-                        Console.Write(" | ");
+                        available = theWorld[z].map[x, y].takeItems(index);
+                        int leftovers = addItems(index.item, available);
+                        Console.WriteLine(" | ");
                     }
                     Console.WriteLine("");
                     theWorld[z].map[x, y].cleanupItems();

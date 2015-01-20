@@ -24,6 +24,15 @@ namespace Botcraft
             mob = null;
         }
 
+        public int takeItems(ItemRecord itemByName)
+        {
+            int output;
+
+            ItemRecord target = items.Find( r => itemByName.item.id == r.item.id);
+            output = target.quantity;
+            items.Remove(target);
+            return output;
+        }
         public bool mine(int minePower)
         {
             return block.mine(minePower);

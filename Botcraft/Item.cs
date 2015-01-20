@@ -8,29 +8,26 @@ namespace Botcraft
 {
     class ItemRecord
     {
-        public Item item { get; private set; }
-        public int quantity { get; private set; }
+        public Item item { get; set; }
+        public int quantity { get; set; }
 
         public ItemRecord(Item _item, int _quantity)
         {
             item = _item;
             quantity = _quantity;
         }
-        public void alterQuantity(int deltaQ)
-        {
-            quantity += deltaQ;
-        }
+        
     }
     
     class Item
     {
-        public String name;
         public int maxQuantity;
+        public ItemID id;
 
-        public Item(String newName)
+        public Item(ItemID _id)
         {
-            name = newName;
             maxQuantity = 10;
+            id = _id;
         }
 
         
@@ -43,8 +40,8 @@ namespace Botcraft
         public int[] statBonus = new int[Enum.GetNames(typeof(Stats)).Length];
         public bool[] fitsSlot = new bool[Enum.GetNames(typeof(EquipLoc)).Length];
         //Constructors
-        public Equipment(String newName, bool[] slots, int[] stats)
-            : base(newName)
+        public Equipment(ItemID id, bool[] slots, int[] stats)
+            : base(id)
         {
             maxQuantity = 1;
             for (int i = 0; i < Enum.GetNames(typeof(EquipLoc)).Length; i++)

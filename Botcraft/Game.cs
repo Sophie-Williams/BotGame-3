@@ -54,9 +54,12 @@ namespace Botcraft
             moblist.Add(new Mob(0, 2, 2, '$', ConsoleColor.Green, "Rob", testQueue));
 
         }
+
         private void itemTest()
         {
-            floors[0].map[0, 2].items.Add(new ItemRecord(new Item("TestItem"), 1));
+            floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item1), 8));
+            floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item2), 2));
+            floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item1), 3));
             Queue<MobCmd> itemTestQueue = new Queue<MobCmd>(new MobCmd[] { MobCmd.MoveWest, MobCmd.MoveWest, MobCmd.MoveEast, MobCmd.Pause });
             moblist.Add(new Mob(0, 0, 4, '%', ConsoleColor.Red, "PickUp", itemTestQueue));
         }

@@ -5,7 +5,9 @@
     enum EquipLoc { Body, Tool, Battery, Trinket1, Trinket2 }
 
     enum Stats { HP, Armor, Speed, ScanRadius, AttackPower, MinePower, MaxCapacity }
-    
+
+    enum ItemID { Item1, Item2 }
+
     enum MobCmd {
         MoveNorth, MoveSouth, MoveEast, MoveWest, MoveUp, MoveDown,
         ActNorth, ActSouth, ActEast, ActWest, ActUp, ActDown,
