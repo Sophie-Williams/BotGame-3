@@ -11,6 +11,8 @@ namespace Botcraft
     {
         public Block block;
         public Mob mob;
+        public List<ItemRecord> items = new List<ItemRecord>();
+
         public static implicit operator Block(BlockSpace bs)
         { return bs.block; }
         public static implicit operator Mob(BlockSpace bs)
@@ -22,6 +24,11 @@ namespace Botcraft
             mob = null;
         }
 
+        public bool mine(int minePower)
+        {
+            return block.mine(minePower);
+            
+        }
         public ConsoleColor getDispColor()
         {
             if (mob != null)
@@ -61,6 +68,11 @@ namespace Botcraft
             mob = null;
         }
 
+
+        public void cleanupItems()
+        {
+            items.RemoveAll(r => (r.quantity == 0));
+        }
     }
 
     class Level
@@ -98,25 +110,26 @@ namespace Botcraft
         }
 
         //Public Methods
-        public void showMap()
+        public void showMap(int floorNumToDisplay)
         {
             /*  |-------> y+
              *  |
              *  |
              *  v x+
              */
+            Console.WriteLine("Floor {0}:",floorNumToDisplay);
             for (int i = 0; i < Game.MAP_HEIGHT; i++)
             {
                 for (int j = 0; j < Game.MAP_WIDTH; j++)
                 {
                     Console.ForegroundColor = map[i, j].getDispColor();
-                    Console.Write(map[i,j].getDispChar());
+                    Console.Write(map[i, j].getDispChar());
                 }
                 Console.Write("\n");
             }
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ResetColor();
+            Console.Write("\n");
         }
-
         //Private Methods
         private void rndFill(BlockID[] fillers)
         {

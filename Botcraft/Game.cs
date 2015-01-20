@@ -20,6 +20,7 @@ namespace Botcraft
         {
             init();
             basicTest();
+            itemTest();
         }
 
         //Public Methods
@@ -27,9 +28,8 @@ namespace Botcraft
         {
             foreach (Mob mob in moblist)
             {
-                Console.WriteLine("\nGame.tick()\n");
+                Console.WriteLine("\n---\nGame.tick()\n---\n");
                 mob.tick();
-                floors[mob.z].showMap();
             }
         }
         
@@ -38,13 +38,11 @@ namespace Botcraft
         {
 
             floors[0] = new Level(0, new BlockID[] { BlockID.Air, BlockID.Dirt });
-            floors[0].showMap();
-            Console.WriteLine("Floor: 0");
+            floors[0].showMap(0);
             for (int i = 1; i < MAP_DEPTH; i++)
     		    {
                     floors[i] = new Level(i, new BlockID[] { BlockID.Stone, BlockID.Dirt });
-                    floors[i].showMap();
-                    Console.WriteLine("Floor: " + i);
+                    floors[i].showMap(i);
 			    }
             
             
@@ -52,10 +50,15 @@ namespace Botcraft
 
         private void basicTest()
         {
-            Queue<MobCmd> testQueue = new Queue<MobCmd>(new MobCmd[] {MobCmd.MoveWest, MobCmd.MoveSouth, MobCmd.Scan, MobCmd.MoveEast, MobCmd.MoveNorth, MobCmd.Pause, MobCmd.Pause });
-            moblist.Add(new Mob(floors, 0, 2, 2, '$', ConsoleColor.Green, "Rob", testQueue));
+            Queue<MobCmd> testQueue = new Queue<MobCmd>(new MobCmd[] { MobCmd.Pause, MobCmd.MoveWest, MobCmd.MoveSouth, MobCmd.Scan, MobCmd.MoveEast, MobCmd.MoveNorth, MobCmd.Pause });
+            moblist.Add(new Mob(0, 2, 2, '$', ConsoleColor.Green, "Rob", testQueue));
 
         }
-
+        private void itemTest()
+        {
+            floors[0].map[0, 2].items.Add(new ItemRecord(new Item("TestItem"), 1));
+            Queue<MobCmd> itemTestQueue = new Queue<MobCmd>(new MobCmd[] { MobCmd.MoveWest, MobCmd.MoveWest, MobCmd.MoveEast, MobCmd.Pause });
+            moblist.Add(new Mob(0, 0, 4, '%', ConsoleColor.Red, "PickUp", itemTestQueue));
+        }
     }
 }

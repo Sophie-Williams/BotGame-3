@@ -29,7 +29,6 @@ namespace Botcraft
         public AppWindow()
             : base()
         {
-            Console.WriteLine("Press any key to exit.");
             KeyPress += HandleKeyPressEvent;
             Load += HandleOnLoadEvent;
             RenderFrame += HandleRenderEvent;
@@ -38,7 +37,6 @@ namespace Botcraft
         public AppWindow(int width, int height)
             : base(width, height)
         {
-            Console.WriteLine("Press any key to exit.");
             KeyPress += HandleKeyPressEvent;
             Load += HandleOnLoadEvent;
             RenderFrame += HandleRenderEvent;
@@ -64,7 +62,7 @@ namespace Botcraft
         
         public void HandleRenderEvent(object sender, FrameEventArgs e)
         {
-            Console.WriteLine("HandleRenderEevent"); 
+            //Console.WriteLine("HandleRenderEevent"); 
             GL.Clear(ClearBufferMask.DepthBufferBit |
                              ClearBufferMask.ColorBufferBit |
                              ClearBufferMask.AccumBufferBit |
