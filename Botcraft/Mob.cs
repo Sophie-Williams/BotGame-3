@@ -331,19 +331,52 @@ namespace Botcraft
                     {                        
                         Console.Write(" | ");
                         available = theWorld[z].map[x, y].takeItems(index);
-                        int leftovers = addItems(index.item, available);
+                        int leftovers = addItems(index.item, available);  //What happens to leftovers?
                         Console.WriteLine(" | ");
                     }
                     Console.WriteLine("");
                     theWorld[z].map[x, y].cleanupItems();
                     break;
-                case MobCmd.ActNorth:
+                case MobCmd.ActNorth: // x-1
+                    if(theWorld[z].map[x-1,y].mob != null)
+                    {
+                        Console.Write("TODO: Attack");
+                    }
+                    if(theWorld[z].map[x-1,y].isMovable() == false)
+                    {
+                        mine(x - 1, y, z);
+                    }
                     break;
                 case MobCmd.ActSouth:
+                    if(theWorld[z].map[x+1,y].mob != null)
+                    {
+                        Console.Write("TODO: Attack");
+                    }
+                    if(theWorld[z].map[x+1,y].isMovable() == false)
+                    {
+                        mine(x + 1, y, z);
+                    }
                     break;
-                case MobCmd.ActEast:
+                case MobCmd.ActEast: // y+1
+                    if(theWorld[z].map[x,y+1].mob != null)
+                    {
+                        Console.Write("TODO: Attack");
+                    }
+                    Console.WriteLine("Breakpoint: Mob.doCmd(actEast)");
+                    if(theWorld[z].map[x,y+1].isMovable() == false)
+                    {
+                        mine(x, y+1, z);
+                    }
                     break;
                 case MobCmd.ActWest:
+                    if(theWorld[z].map[x,y-1].mob != null)
+                    {
+                        Console.Write("TODO: Attack");
+                    }
+                    if(theWorld[z].map[x,y-1].isMovable() == false)
+                    {
+                        mine(x, y-1, z);
+                    }
                     break;
                 case MobCmd.ActUp:
                     break;

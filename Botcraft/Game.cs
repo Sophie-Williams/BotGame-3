@@ -26,9 +26,9 @@ namespace Botcraft
         //Public Methods
         public void tick()
         {
+            Console.WriteLine("\n---\nGame.tick()\n---\n");
             foreach (Mob mob in moblist)
             {
-                Console.WriteLine("\n---\nGame.tick()\n---\n");
                 mob.tick();
             }
         }
@@ -60,8 +60,8 @@ namespace Botcraft
             floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item1), 8));
             floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item2), 2));
             floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item1), 3));
-            Queue<MobCmd> itemTestQueue = new Queue<MobCmd>(new MobCmd[] { MobCmd.MoveWest, MobCmd.MoveWest, MobCmd.MoveEast, MobCmd.Pause });
-            moblist.Add(new Mob(0, 0, 4, '%', ConsoleColor.Red, "PickUp", itemTestQueue));
+            Queue<MobCmd> itemTestQueue = new Queue<MobCmd>(new MobCmd[] { MobCmd.ActEast, MobCmd.ActEast, MobCmd.ActEast, MobCmd.ActEast, MobCmd.ActEast, MobCmd.ActEast, MobCmd.ActEast, MobCmd.MoveEast, MobCmd.MoveEast, MobCmd.Pause, MobCmd.MoveSouth, MobCmd.Pause, MobCmd.MoveWest, MobCmd.ActWest, MobCmd.ActWest, MobCmd.ActWest, MobCmd.ActWest, MobCmd.ActWest, MobCmd.ActWest, MobCmd.Pause});
+            moblist.Add(new Mob(0, 0, 0, '%', ConsoleColor.Red, "PickUp", itemTestQueue));
         }
     }
 }

@@ -35,7 +35,13 @@ namespace Botcraft
         }
         public bool mine(int minePower)
         {
-            return block.mine(minePower);
+            bool broken = false;
+            bool outBool = block.mine(minePower, ref broken);
+            if (broken)
+            {
+                this.block = BlockFactory.Get(BlockID.Air);
+            }
+            return outBool;
             
         }
         public ConsoleColor getDispColor()

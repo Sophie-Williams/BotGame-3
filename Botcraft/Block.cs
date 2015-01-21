@@ -51,7 +51,7 @@ namespace Botcraft
         }
         
         //Public Methods
-        public bool mine(int minePower)
+        public bool mine(int minePower, ref bool broken)
         {
             if (id == BlockID.Air)
                 return false;   //nothing to mine
@@ -61,7 +61,7 @@ namespace Botcraft
                 health -= 5 * (minePower + 1);
                 if (health == 0)
                 {
-                    this.id = BlockID.Air;
+                    broken = true;
                 }
                 return true;
             }
