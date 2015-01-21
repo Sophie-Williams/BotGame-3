@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Botcraft.Game" Collapsed="true">
-    <Position X="5" Y="0.5" Width="3.75" />
+    <Position X="6.5" Y="0.5" Width="3.75" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
       <Compartment Name="Methods" Collapsed="true" />
@@ -12,7 +12,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AABAAAAAAAAAAEIAAAAIAAIIAAACAAIAAAAAAAAAAAA=</HashCode>
+      <HashCode>AABAAAAAAAAAAEIAAAAIAIIIAAACAAIAAAAAAAAAAAA=</HashCode>
       <FileName>Game.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -20,13 +20,13 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Botcraft.Level" Collapsed="true">
-    <Position X="6.25" Y="1.5" Width="1.25" />
+    <Position X="7.75" Y="1.5" Width="1.25" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <AssociationLine Name="map" Type="Botcraft.BlockSpace">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.44" Y="0.485" />
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.69" Y="0.485" Height="0.182" Width="0.67" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
@@ -38,14 +38,14 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Botcraft.BlockFactory" Collapsed="true">
-    <Position X="11" Y="2.25" Width="1.5" />
+    <Position X="12.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Block.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Botcraft.Block">
-    <Position X="9.25" Y="2.25" Width="1.5" />
+    <Position X="10.75" Y="2.25" Width="1.5" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
@@ -55,7 +55,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QAAQAAACAIAAAAAgAAgAAAAAAAAAAAAAAAAAAAAAAgg=</HashCode>
+      <HashCode>QAAQAAACAIAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgg=</HashCode>
       <FileName>Block.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -63,38 +63,56 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Botcraft.BlockSpace" Collapsed="true">
-    <Position X="6.25" Y="2.75" Width="1.5" />
+    <Position X="7.75" Y="2.75" Width="1.5" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <AssociationLine Name="block" Type="Botcraft.Block">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.881" Y="0.123" />
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.756" Y="0.061" Height="0.182" Width="0.587" />
       </MemberNameLabel>
     </AssociationLine>
     <AssociationLine Name="mob" Type="Botcraft.Mob">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.923" Y="0.081" />
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.402" Y="0.018" Height="0.182" Width="0.524" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="items" Type="Botcraft.ItemRecord">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="1.11" Y="0.623" Height="0.182" Width="0.67" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACIAACAAAAAAAAAAAABAAgAAAAAAgBBAAAAAAABAA=</HashCode>
-      <FileName>Level.cs</FileName>
+      <HashCode>AAACIAACAgAAAAAAAAgABAAgAAACAAgBBAAAAAAABAA=</HashCode>
+      <FileName>BlockSpace.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="block" />
       <Field Name="mob" />
     </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="items" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Botcraft.Mob" Collapsed="true">
-    <Position X="3.25" Y="2.75" Width="1.5" />
+    <Position X="4" Y="2.75" Width="1.5" />
     <Compartments>
       <Compartment Name="Properties" Collapsed="true" />
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <AssociationLine Name="theWorld" Type="Botcraft.Level">
       <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
-        <Position X="1.193" Y="-0.94" Height="0.182" Width="1.045" />
+        <Position X="1.13" Y="0.081" Height="0.182" Width="1.045" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="equipArray" Type="Botcraft.Equipment">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.039" Y="1.11" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="inventory" Type="Botcraft.ItemRecord">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.088" Y="0.644" Height="0.182" Width="0.816" />
       </MemberNameLabel>
     </AssociationLine>
     <AssociationLine Name="cmdStack" Type="Botcraft.MobCmd">
@@ -107,54 +125,60 @@
         <Position X="0.319" Y="-0.107" />
       </MemberNameLabel>
     </AssociationLine>
-    <AssociationLine Name="inventory" Type="Botcraft.ItemRecord">
-      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
-        <Position X="-0.252" Y="1.005" Height="0.182" Width="0.816" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AEFUAEACAIAIgABgIAAAAAAAgAAEAAACiABhIQAEgAA=</HashCode>
+      <HashCode>AEFUEEACAIAIgABgIAAAAAAAgAAEAAACiABhIQAEgAA=</HashCode>
       <FileName>Mob.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="baseStats" />
+    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Field Name="theWorld" />
+      <Field Name="equipArray" />
+      <Field Name="inventory" />
       <Field Name="cmdStack" />
       <Field Name="cmdQueue" />
-      <Field Name="inventory" />
-      <Field Name="equipArray" />
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Botcraft.ItemRecord" Collapsed="true">
-    <Position X="3" Y="4.75" Width="1.5" />
+    <Position X="6" Y="4" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <AssociationLine Name="item" Type="Botcraft.Item">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.277" Y="0.06" />
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.753" Y="0.464" Height="0.182" Width="0.628" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAQCAAAAAAAAAAAA=</HashCode>
-      <FileName>Item.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>ItemRecord.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="item" />
     </ShowAsAssociation>
   </Class>
   <Class Name="Botcraft.Item" Collapsed="true">
-    <Position X="5.25" Y="4.75" Width="1.5" />
+    <Position X="5.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
       <FileName>Item.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Botcraft.Equipment" Collapsed="true">
-    <Position X="5.25" Y="3.5" Width="1.5" />
+    <Position X="3.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAABAAAAAEAAA=</HashCode>
-      <FileName>Item.cs</FileName>
+      <FileName>Equipment.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Struct Name="System.Int32" Collapsed="true">
+    <Position X="3.5" Y="1" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Struct>
   <Enum Name="Botcraft.BlockID" Collapsed="true">
-    <Position X="9.25" Y="1.25" Width="1.25" />
+    <Position X="10.75" Y="1.25" Width="1.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAQAEAAAAAAAAgA=</HashCode>
       <FileName>enums.cs</FileName>

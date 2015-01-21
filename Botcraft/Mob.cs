@@ -213,6 +213,47 @@ namespace Botcraft
             }
             else return null;
         }
+        private void attackOrMine(int targetX, int targetY, int targetZ)
+        {
+            if(
+                targetX < 0 || targetX > Game.MAP_HEIGHT ||
+                targetY < 0 || targetY > Game.MAP_WIDTH ||
+                targetZ < 0 || targetZ > Game.MAP_DEPTH
+                ) { return; }
+            if (theWorld[z].map[x - 1, y].isMovable() == false)
+            {
+                if (theWorld[z].map[x - 1, y].mob != null)
+                {
+                    theWorld[z].map[x - 1, y].mob.takeDamage(this);
+                    Console.Write("TODO: Attack");
+                }
+                else
+                {
+                    mine(x - 1, y, z);
+                }
+            }
+         }
+        private void mine(int targetX, int targetY, int targetZ)
+        {
+            theWorld[targetZ].map[targetX, targetY].mine(getStat(Stats.MinePower));
+        }
+        private void moveTo(int newX, int newY, int newZ)
+        {
+            //try to move to the location
+            if (theWorld[newZ].map[newX, newY].enter(this))    //returns false if space is occupied by a mob or block
+            {
+                theWorld[z].map[x, y].leave();
+                this.x = newX;
+                this.y = newY;
+                this.z = newZ;
+                if(theWorld[z].map[x,y].items.Count > 0)
+                    cmdStack.Push(MobCmd.GetItems);
+            }
+            if (theWorld[z+1].map[x,y].isMovable())
+            {
+                cmdStack.Push(MobCmd.MoveDown);     //Fall if possible; 
+            }
+        }
         private void scan()
         {
             int scanRadius = getStat(Stats.ScanRadius);
@@ -271,27 +312,26 @@ namespace Botcraft
             Console.ResetColor();
             Console.WriteLine("--End Scan--\n");
         }
-        private void moveTo(int newX, int newY, int newZ)
+        private void loot()
         {
-            //try to move to the location
-            if (theWorld[newZ].map[newX, newY].enter(this))    //returns false if space is occupied by a mob or block
+            int available;
+            ItemRecord[] blockItemArray = theWorld[z].map[x, y].items.ToArray();
+            List<ItemRecord> dropList = new List<ItemRecord>();
+            foreach (ItemRecord index in blockItemArray)
             {
-                theWorld[z].map[x, y].leave();
-                this.x = newX;
-                this.y = newY;
-                this.z = newZ;
-                if(theWorld[z].map[x,y].items.Count > 0)
-                    cmdStack.Push(MobCmd.GetItems);
+                Console.Write(" | ");
+                available = theWorld[z].map[x, y].takeItemByItemName(index);
+                int leftovers = addItems(index.item, available);  //What happens to leftovers?
+                dropList.Add(new ItemRecord(index.item, leftovers));
+                Console.WriteLine(" | ");
             }
-            if (theWorld[z+1].map[x,y].isMovable())
-            {
-                cmdStack.Push(MobCmd.MoveDown);     //Fall if possible; 
-            }
+            Console.WriteLine("");
+            theWorld[z].map[x, y].cleanupItems();
+                    
         }
-        private void mine(int targetX, int targetY, int targetZ)
-        {
-            theWorld[targetZ].map[targetX, targetY].mine(getStat(Stats.MinePower));
-        }
+
+
+
         private void doCmd(MobCmd cmd)
         {
             Console.WriteLine("{0} is executing the {1} command", name, cmd);
@@ -325,62 +365,25 @@ namespace Botcraft
                 case MobCmd.Idle:
                     break;
                 case MobCmd.GetItems:
-                    int available;
-                    ItemRecord[] blockItemArray = theWorld[z].map[x, y].items.ToArray();
-                    foreach (ItemRecord index in blockItemArray)
-                    {                        
-                        Console.Write(" | ");
-                        available = theWorld[z].map[x, y].takeItems(index);
-                        int leftovers = addItems(index.item, available);  //What happens to leftovers?
-                        Console.WriteLine(" | ");
-                    }
-                    Console.WriteLine("");
-                    theWorld[z].map[x, y].cleanupItems();
+                    loot();
                     break;
                 case MobCmd.ActNorth: // x-1
-                    if(theWorld[z].map[x-1,y].mob != null)
-                    {
-                        Console.Write("TODO: Attack");
-                    }
-                    if(theWorld[z].map[x-1,y].isMovable() == false)
-                    {
-                        mine(x - 1, y, z);
-                    }
+                    attackOrMine(x - 1, y, z);
                     break;
                 case MobCmd.ActSouth:
-                    if(theWorld[z].map[x+1,y].mob != null)
-                    {
-                        Console.Write("TODO: Attack");
-                    }
-                    if(theWorld[z].map[x+1,y].isMovable() == false)
-                    {
-                        mine(x + 1, y, z);
-                    }
+                    attackOrMine(x + 1, y, z);
                     break;
                 case MobCmd.ActEast: // y+1
-                    if(theWorld[z].map[x,y+1].mob != null)
-                    {
-                        Console.Write("TODO: Attack");
-                    }
-                    Console.WriteLine("Breakpoint: Mob.doCmd(actEast)");
-                    if(theWorld[z].map[x,y+1].isMovable() == false)
-                    {
-                        mine(x, y+1, z);
-                    }
+                    attackOrMine(x, y + 1, z);
                     break;
                 case MobCmd.ActWest:
-                    if(theWorld[z].map[x,y-1].mob != null)
-                    {
-                        Console.Write("TODO: Attack");
-                    }
-                    if(theWorld[z].map[x,y-1].isMovable() == false)
-                    {
-                        mine(x, y-1, z);
-                    }
+                    attackOrMine(x, y - 1, z);
                     break;
                 case MobCmd.ActUp:
+                    attackOrMine(x, y, z-1);
                     break;
                 case MobCmd.ActDown:
+                    attackOrMine(x, y, z+1);
                     break;
                 case MobCmd.Scan:
                     scan();
@@ -403,6 +406,17 @@ namespace Botcraft
                 doCmd( replacementCmd );
             }
         }
-    
+        private bool takeDamage(Mob attacker)
+        {
+            baseStats[(int)Stats.HP] -= (5 + attacker.getStat(Stats.AttackPower) - getStat(Stats.Armor));
+            if(baseStats[(int)Stats.HP] <= 0)
+            {
+                //Die, drop items
+                Console.WriteLine("{0} died!  Oh, no!", name);
+                return true;
+            }
+            else
+            return false;
+        }
     }
 }

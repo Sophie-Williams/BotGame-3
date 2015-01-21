@@ -44,9 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Block.cs" />
+    <Compile Include="BlockSpace.cs" />
+    <Compile Include="Building.cs" />
     <Compile Include="enums.cs" />
+    <Compile Include="Equipment.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="ItemRecord.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Mob.cs" />
     <Compile Include="Program.cs" />
