@@ -16,9 +16,9 @@ namespace Botcraft
     {
         static void Main(string[] args)
         {
-            using(AppWindow window = new AppWindow())
+            using(AppWindow doobawindow = new AppWindow())
             {
-                window.Run(30,30);
+                doobawindow.Run(30,30);
             }
         }
     }
@@ -62,12 +62,66 @@ namespace Botcraft
         
         public void HandleRenderEvent(object sender, FrameEventArgs e)
         {
-            //Console.WriteLine("HandleRenderEevent"); 
-            GL.Clear(ClearBufferMask.DepthBufferBit |
-                             ClearBufferMask.ColorBufferBit |
-                             ClearBufferMask.AccumBufferBit |
-                             ClearBufferMask.StencilBufferBit);
-            SwapBuffers();
+        //'First Clear Buffers
+        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.Clear(ClearBufferMask.DepthBufferBit);
+ 
+        //'Basic Setup for viewing
+        Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(1.04f, 4f / 3f, 1f, 10000f); //'Setup Perspective
+        Matrix4 lookat = Matrix4.LookAt(100, 20, 0, 0, 50, 0, 0, 1, 0); //'Setup camera
+        GL.MatrixMode(MatrixMode.Projection);// 'Load Perspective
+        GL.LoadIdentity();
+        GL.LoadMatrix(ref perspective);
+        GL.MatrixMode(MatrixMode.Modelview); //'Load Camera
+        GL.LoadIdentity();
+        GL.LoadMatrix(ref lookat);
+        GL.Viewport(0, 0, Width, Height); //'Size of window
+        GL.Enable(EnableCap.DepthTest); //'Enable correct Z Drawings
+        GL.DepthFunc(DepthFunction.Less); //'Enable correct Z Drawings
+ 
+        //'Rotating
+        //GL.Rotate(NumericUpDown1.Value, 0, 0, 1);
+        //GL.Rotate(NumericUpDown2.Value, 0, 1, 0);
+ 
+        //'Draw pyramid, Y is up, Z is twards you, X is left and right
+        //'Vertex goes (X,Y,Z)
+        GL.Begin(PrimitiveType.Triangles);
+        //'Face 1
+        GL.Color3(Color.Red);
+        GL.Vertex3(50, 0, 0);
+        GL.Color3(Color.White);
+        GL.Vertex3(0, 25, 0);
+        GL.Color3(Color.Blue);
+        GL.Vertex3(0, 0, 50);
+        //'Face 2
+        GL.Color3(Color.Green);
+        GL.Vertex3(-50, 0, 0);
+        GL.Color3(Color.White);
+        GL.Vertex3(0, 25, 0);
+        GL.Color3(Color.Blue);
+        GL.Vertex3(0, 0, 50);
+        //'Face 3
+        GL.Color3(Color.Red);
+        GL.Vertex3(50, 0, 0);
+        GL.Color3(Color.White);
+        GL.Vertex3(0, 25, 0);
+        GL.Color3(Color.Blue);
+        GL.Vertex3(0, 0, -50);
+        //'Face 4
+        GL.Color3(Color.Green);
+        GL.Vertex3(-50, 0, 0);
+        GL.Color3(Color.White);
+        GL.Vertex3(0, 25, 0);
+        GL.Color3(Color.Blue);
+        GL.Vertex3(0, 0, -50);
+ 
+        //'Finish the begin mode with "end"
+        GL.End();
+ 
+        //'Finally...
+        //GraphicsContext. = True; //'Caps frame rate as to not over run GPU
+
+            this.SwapBuffers();
         }
 
     }

@@ -208,7 +208,7 @@ namespace Botcraft
             if (cmdQueue.Count == 0)
             {
 
-                Queue<MobCmd> newQueue = new Queue<MobCmd>(new[] { MobCmd.Idle, MobCmd.Scan, MobCmd.Pause });
+                Queue<MobCmd> newQueue = new Queue<MobCmd>(new[] { MobCmd.Idle, MobCmd.Scan });
                 return newQueue;
             }
             else return null;
