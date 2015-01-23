@@ -8,11 +8,8 @@
 
     enum ItemID { Item1, Item2 }
 
-    enum MobCmd1 {
-        MoveNorth, MoveSouth, MoveEast, MoveWest, MoveUp, MoveDown,
-        ActNorth, ActSouth, ActEast, ActWest, ActUp, ActDown,
-        GetItems, Empty, Idle, Scan, Quit, Pause }
+    enum MobCmd { Move, Attack, Mine, Idle, Scan, Quit, Pause, Loot}
 
-    enum MobActEnum { Move, Attack, Mine, Idle, Scan, Quit, Pause, Loot}
+    enum Teams { Player1  }
 
 }

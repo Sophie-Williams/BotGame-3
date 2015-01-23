@@ -12,6 +12,38 @@ namespace Botcraft
         public Mob mob;
         public List<ItemRecord> items = new List<ItemRecord>();
         public Building building;
+        public char DispChar
+        {
+            get
+            {
+                if (mob != null)
+                {
+                    return mob.dispChar;
+                }
+                else if (building != null)
+                {
+                    return building.dispChar;
+                }
+                else
+                    return block.dispChar;
+            }
+        }
+        public ConsoleColor DispColor
+        {
+            get
+            {
+                if (mob != null)
+                {
+                    return mob.dispColor;
+                }
+                else if (building != null)
+                {
+                    return building.dispColor;
+                }
+                else
+                    return block.dispColor;
+            }
+        }
 
         public static implicit operator Block(BlockSpace bs)
         { return bs.block; }
@@ -88,15 +120,6 @@ namespace Botcraft
             }
             else
                 return block.dispColor;
-        }
-        public char getDispChar()
-        {
-            if (mob != null)
-            {
-                return mob.dispChar;
-            }
-            else
-                return block.dispChar;
         }
         public bool enter(Mob newMob)
         {

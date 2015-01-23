@@ -54,8 +54,8 @@ namespace Botcraft
             {
                 for (int j = 0; j < Game.MAP_WIDTH; j++)
                 {
-                    Console.ForegroundColor = map[i, j].getDispColor();
-                    Console.Write(map[i, j].getDispChar());
+                    Console.ForegroundColor = map[i, j].DispColor;
+                    Console.Write(map[i, j].DispChar);
                 }
                 Console.Write("\n");
             }

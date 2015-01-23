@@ -45,12 +45,13 @@ namespace Botcraft
             }
         }
 
+        //Properties (I think)
+        public String name { get; private set; }
         public int x { get; private set; }
         public int y { get; private set; }
         public int z { get; private set; }
-        public String name { get; private set; }
         public char dispChar { get; private set; }
-        public ConsoleColor dispColor { get; set; }
+        public ConsoleColor dispColor { get; private set; }
         public char[,,] scanData { get; private set; }
         public MobAction lastCmd {get; private set;}
 
@@ -139,6 +140,10 @@ namespace Botcraft
                 cmdStack.Push(incoming.Pop());
             }
         }
+        public int GainItems(ItemRecord itemRecord)
+        {
+            return GainItems(itemRecord.item, itemRecord.quantity);
+        }
         public int GainItems(Item newItem, int quantityToAdd)
         {
             int leftoverItemCount = quantityToAdd;
@@ -211,8 +216,8 @@ namespace Botcraft
             {
                 Queue<MobAction> newQueue = new Queue<MobAction>();
                 newQueue.Enqueue(new MobAction());
-                newQueue.Enqueue(new MobAction(MobActEnum.Scan));
-                newQueue.Enqueue(new MobAction(MobActEnum.Pause));
+                newQueue.Enqueue(new MobAction(MobCmd.Scan));
+                newQueue.Enqueue(new MobAction(MobCmd.Pause));
 
                 return newQueue;
             }
@@ -244,11 +249,11 @@ namespace Botcraft
                 this.y = newY;
                 this.z = newZ;
                 if(theWorld[z].map[x,y].items.Count > 0)
-                    cmdStack.Push(new MobAction(MobActEnum.Loot));
+                    cmdStack.Push(new MobAction(MobCmd.Loot));
             }
             if (theWorld[z+1].map[x,y].isMovable())
             {
-                cmdStack.Push(new MobAction(MobActEnum.Move, "D"));     //Fall if possible; 
+                cmdStack.Push(new MobAction(MobCmd.Move, "D"));     //Fall if possible; 
             }
         }
         private void Scan()
@@ -287,8 +292,8 @@ namespace Botcraft
                         }
                         if (targetX >= 0 && targetX <= Game.MAP_HEIGHT && targetY >= 0 && targetY <= Game.MAP_WIDTH)
                         {
-                            scanData[scanZ, scanX, scanY] = theWorld[targetZ].map[targetX, targetY].getDispChar();
-                            Console.ForegroundColor = theWorld[targetZ].map[targetX, targetY].getDispColor();
+                            scanData[scanZ, scanX, scanY] = theWorld[targetZ].map[targetX, targetY].DispChar;
+                            Console.ForegroundColor = theWorld[targetZ].map[targetX, targetY].DispColor;
                         }
                         else
                         {
@@ -311,7 +316,21 @@ namespace Botcraft
         }
         private void Loot()
         {
-            int available;
+            ItemRecord[] itemArray = theWorld[z].map[x, y].items.ToArray();
+            theWorld[z].map[x, y].items.Clear();
+
+            foreach (ItemRecord index in itemArray)
+            {
+                int leftovers = GainItems(index);
+
+                if (leftovers > 0)
+                {
+                    theWorld[z].map[x, y].GainItems(index.item, leftovers);
+                }
+
+
+            }
+
 
             Console.WriteLine("You have no loot function!");
 
@@ -340,35 +359,35 @@ namespace Botcraft
             
             switch (cmdObj.cmd)
             {
-                case MobActEnum.Move:
+                case MobCmd.Move:
                     if (theWorld[targetZ].map[targetX, targetY].isMovable())
                     {
                         MoveTo(targetX, targetY, targetZ);
                     }
                     break;
-                case MobActEnum.Attack:
+                case MobCmd.Attack:
                     if (theWorld[targetZ].map[targetX, targetY].mob != null)
                     {
                         Attack(targetX, targetY, targetZ);
                     }break;
-                case MobActEnum.Mine:
+                case MobCmd.Mine:
                     if (theWorld[targetZ].map[targetX, targetY].block.id != BlockID.Air)
                     {
                         Mine(targetX, targetY, targetZ);
                     }break;
-                case MobActEnum.Idle:
+                case MobCmd.Idle:
                     break;
-                case MobActEnum.Scan:
+                case MobCmd.Scan:
                     Scan();
                     break;
-                case MobActEnum.Quit:
+                case MobCmd.Quit:
                     break;
-                case MobActEnum.Pause:
+                case MobCmd.Pause:
                     Console.WriteLine("Paused by {0}", this.name);
                     //Console.ReadLine();
                     Console.WriteLine("Breakpoint");
                     break;
-                case MobActEnum.Loot:
+                case MobCmd.Loot:
                     Loot();
                     break;
                 default:
@@ -388,81 +407,5 @@ namespace Botcraft
             else
             return false;
         }
-       /*  |-------> y+
-        *  |
-        *  |
-        *  v x+
-        *
-    
-        private void doCmd(MobCmd cmd)
-        {
-            Console.WriteLine("{0} is executing the {1} command", name, cmd);
-            MobCmd replacementCmd = MobCmd.Empty;
-            
-            switch (cmd)
-            {
-                case MobCmd.MoveWest:
-                    moveTo(x, y - 1, z);
-                    break;
-                case MobCmd.MoveSouth:
-                    moveTo(x+1, y, z);
-                    break;
-                case MobCmd.MoveEast:
-                    moveTo(x, y + 1, z);
-                    break;
-                case MobCmd.MoveNorth:
-                    moveTo(x-1, y, z);
-                    break;
-                case MobCmd.MoveUp:
-                    moveTo(x, y, z - 1);
-                    break;
-                case MobCmd.MoveDown:
-                    moveTo(x, y, z + 1);
-                    break;
-                case MobCmd.Idle:
-                    break;
-                case MobCmd.GetItems:
-                    loot();
-                    break;
-                case MobCmd.ActNorth: // x-1
-                    attackOrMine(x - 1, y, z);
-                    break;
-                case MobCmd.ActSouth:
-                    attackOrMine(x + 1, y, z);
-                    break;
-                case MobCmd.ActEast: // y+1
-                    attackOrMine(x, y + 1, z);
-                    break;
-                case MobCmd.ActWest:
-                    attackOrMine(x, y - 1, z);
-                    break;
-                case MobCmd.ActUp:
-                    attackOrMine(x, y, z-1);
-                    break;
-                case MobCmd.ActDown:
-                    attackOrMine(x, y, z+1);
-                    break;
-                case MobCmd.Scan:
-                    scan();
-                    break;
-                case MobCmd.Pause:
-                    theWorld[z].showMap(z);
-                    Console.WriteLine("Paused by {0}, displaying floor map", name);
-                    Console.WriteLine("Press any key to continue\n");
-                    Console.ReadKey(true);
-                    break;
-                case MobCmd.Quit:
-                    Console.WriteLine("QUIT");
-                    break;
-                default:
-                    break;
-             
-            }
-            if (replacementCmd != MobCmd.Empty)
-            {
-                doCmd( replacementCmd );
-            }
-        }
-        */
     }
 }

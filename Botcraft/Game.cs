@@ -18,13 +18,13 @@ namespace Botcraft
         //Constructor
         public Game()
         {
-            init();
-            basicTest();
-            itemTest();
+            Init();
+            BasicTest();
+            ItemTest();
         }
 
         //Public Methods
-        public void tick()
+        public void Tick()
         {
             Console.WriteLine("\n---\nGame.tick()\n---\n");
             foreach (Mob mob in moblist)
@@ -34,7 +34,7 @@ namespace Botcraft
         }
         
         //Private Methods
-        private void init()
+        private void Init()
         {
 
             floors[0] = new Level(0, new BlockID[] { BlockID.Air, BlockID.Dirt });
@@ -48,42 +48,36 @@ namespace Botcraft
             
         }
 
-        private void basicTest()
+        private void BasicTest()
         {
 
             Queue<MobAction> testQueue = new Queue<MobAction>();
-            testQueue.Enqueue(new MobAction(MobActEnum.Pause));
-            testQueue.Enqueue(new MobAction(MobActEnum.Move, "W"));
-            testQueue.Enqueue(new MobAction(MobActEnum.Move, "S"));
-            testQueue.Enqueue(new MobAction(MobActEnum.Scan));
-            testQueue.Enqueue(new MobAction(MobActEnum.Move, "E"));
-            testQueue.Enqueue(new MobAction(MobActEnum.Move, "N"));
-            testQueue.Enqueue(new MobAction(MobActEnum.Pause));
+            testQueue.Enqueue(new MobAction(MobCmd.Pause));
+            testQueue.Enqueue(new MobAction(MobCmd.Move, "W"));
+            testQueue.Enqueue(new MobAction(MobCmd.Move, "S"));
+            testQueue.Enqueue(new MobAction(MobCmd.Scan));
+            testQueue.Enqueue(new MobAction(MobCmd.Move, "E"));
+            testQueue.Enqueue(new MobAction(MobCmd.Move, "N"));
+            testQueue.Enqueue(new MobAction(MobCmd.Pause));
 
             moblist.Add(new Mob(0, 2, 2, '$', ConsoleColor.Green, "Rob", testQueue));
            
         }
-
-        /*
-         * Need to rebuild the test queues using List<MobAction>
-         * Figure out how to build it from an array or make a convenient constructor
-         */
-
-        private void itemTest()
+        private void ItemTest()
         {
             floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item1), 8));
             floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item2), 2));
             floors[0].map[0, 2].items.Add(new ItemRecord(new Item(ItemID.Item1), 3));
 
             Queue<MobAction> itemTestQueue = new Queue<MobAction>();
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Mine, "E", 9));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Pause));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Move, "E", 2));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Loot));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Pause));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Move, "S"));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Move, "W"));
-            itemTestQueue.Enqueue(new MobAction(MobActEnum.Mine, "W", 6));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Mine, "E", 9));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Pause));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Move, "E", 2));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Loot));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Pause));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Move, "S"));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Move, "W"));
+            itemTestQueue.Enqueue(new MobAction(MobCmd.Mine, "W", 6));
 
             moblist.Add(new Mob(0, 0, 0, '%', ConsoleColor.Red, "PickUp", itemTestQueue));
         }

@@ -57,7 +57,7 @@ namespace Botcraft
 
         public void HandleUpdateEvent(object sender, FrameEventArgs e)
         {
-            game.tick();
+            game.Tick();
         }
         
         public void HandleRenderEvent(object sender, FrameEventArgs e)

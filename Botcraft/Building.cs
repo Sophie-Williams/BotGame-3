@@ -11,11 +11,15 @@ namespace Botcraft
         //Main base, repair stations, any other fixed building.
         //Moving buildings should probably just be mobs.
         public List<ItemRecord> storage;
-        
+        public char dispChar;
+        public ConsoleColor dispColor;
 
-        public Building()
+        public Building() : this('@', ConsoleColor.Yellow) { }
+        public Building(char avatar, ConsoleColor _color)
         {
             storage = new List<ItemRecord>();
+            dispChar = avatar;
+            dispColor = _color;
 
         }
 
