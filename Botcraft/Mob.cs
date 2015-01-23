@@ -9,9 +9,9 @@ namespace Botcraft
     class Mob
     {
         //Constructors & Related Methods
-        public Mob(int startZ, int startX, int startY, char avatar, ConsoleColor color, String newName, Queue<MobCmd> initQueue)
+        public Mob(int startZ, int startX, int startY, char avatar, ConsoleColor color, String newName, Queue<MobAction> initQueue)
         {
-            lastCmd = MobCmd.Idle;
+            lastCmd = new MobAction();
             name = newName;
             theWorld = Game.floors;
             x = startX;
@@ -27,11 +27,12 @@ namespace Botcraft
                 3,  //ScanRadius
                 0,  //AttackPower
                 0,  //MinePower
-                30  //MaxCapacity
+                30, //MaxCapacity
+                10  //MaxQueue
             });
-            cmdStack = new Stack<MobCmd>();
-            cmdQueue = new Queue<MobCmd>();
-            addCmds(initQueue);
+            cmdStack = new Stack<MobAction>();
+            cmdQueue = new Queue<MobAction>();
+            EnqueueCmds(initQueue);
             
 
             theWorld[z].map[x, y].enter(this);
@@ -51,7 +52,7 @@ namespace Botcraft
         public char dispChar { get; private set; }
         public ConsoleColor dispColor { get; set; }
         public char[,,] scanData { get; private set; }
-        public MobCmd lastCmd {get; private set;}
+        public MobAction lastCmd {get; private set;}
 
         //Private Data
         private int[] baseStats = new int[Stats.GetNames(typeof(Stats)).Length];
@@ -59,11 +60,11 @@ namespace Botcraft
         private Equipment[] equipArray = new Equipment[Enum.GetNames(typeof(EquipLoc)).Length];
         
         private List<ItemRecord> inventory = new List<ItemRecord>();
-        private Stack<MobCmd> cmdStack;
-        private Queue<MobCmd> cmdQueue;
+        private Stack<MobAction> cmdStack;
+        private Queue<MobAction> cmdQueue;
 
         //Public Methods
-        public int getStat(Stats stat)
+        public int GetStat(Stats stat)
         {
             int output = baseStats[(int)stat];
             foreach (Equipment slot in equipArray)
@@ -75,10 +76,10 @@ namespace Botcraft
             }
             return output;
         }
-        public void tick()
+        public void Tick()
         {
-            MobCmd cmdToExec = MobCmd.Empty;
-            Console.WriteLine("Mob.tick() from {0}", name);
+            MobAction cmdToExec = new MobAction();
+            Console.WriteLine("\nMob.Tick() from {0}", name);
             
             //cmdQueue holds AI-given instructions.  cmdStack holds rules-enforced
             //(mining might take multiple actions, idle delay after moving or other actions)
@@ -93,26 +94,23 @@ namespace Botcraft
             }
             
             lastCmd = cmdToExec;
+            DoCmd(cmdToExec);
 
-            if (cmdToExec != MobCmd.Empty)
-            {
-                doCmd(cmdToExec);
-            }
             
-            addCmds(getAiInput());
-            showQueue();
+            EnqueueCmds(GetAiInput());
+            ShowQueue();
             
         }
-        public void showQueue()
+        public void ShowQueue()
         {
             Console.Write("{0}'s Command Queue: ", name);
-            foreach (var cmd in cmdQueue)
+            foreach (var command in cmdQueue)
             {
-                Console.Write("{0}, ",cmd);
+                Console.Write("{0}, ", command.cmd);
             }
             Console.WriteLine();
         }
-        public bool addCmd(MobCmd newCmd)
+        public bool EnqueueCmd(MobAction newCmd)
         {
             if (cmdQueue.Count >= 5)
                 return false;
@@ -120,7 +118,7 @@ namespace Botcraft
             Console.WriteLine("Added " + newCmd + " to cmdQueue");
             return true;
         }
-        public void addCmds(Queue<MobCmd> incoming)
+        public void EnqueueCmds(Queue<MobAction> incoming)
         {
             if (incoming == null) { return; }
             while (incoming.Count > 0)
@@ -129,7 +127,11 @@ namespace Botcraft
                 cmdQueue.Enqueue(incoming.Dequeue());
             }
         }
-        public void addCmds(Stack<MobCmd> incoming)
+        public void PushCmd(MobAction newCmd)
+        {
+            cmdStack.Push(newCmd);
+        }
+        public void PushCmds(Stack<MobAction> incoming)
         {
             incoming.Reverse();
             while(incoming.Count>0)
@@ -137,7 +139,7 @@ namespace Botcraft
                 cmdStack.Push(incoming.Pop());
             }
         }
-        public int addItems(Item newItem, int quantityToAdd)
+        public int GainItems(Item newItem, int quantityToAdd)
         {
             int leftoverItemCount = quantityToAdd;
             while (quantityToAdd > 0)
@@ -161,7 +163,7 @@ namespace Botcraft
                 else
                 {
                     //Item not found in inventory or stack is full
-                    if(inventory.Count < getStat(Stats.MaxCapacity))
+                    if(inventory.Count < GetStat(Stats.MaxCapacity))
                     {
                         //Add the item to the inventory with a count of zero
                         //and let the loop handle getting the count
@@ -176,18 +178,18 @@ namespace Botcraft
             }
             return 0;   // No leftovers
         }
-        public void unequip(EquipLoc location)
+        public void Unequip(EquipLoc location)
         {
 
             if (equipArray[(int)location] == null)  //already empty
                 return;
             else
             {
-                addItems(equipArray[(int)location], 1);
+                GainItems(equipArray[(int)location], 1);
                 equipArray[(int)location] = null;
             }
         }
-        public void equip(EquipLoc location, Equipment item)
+        public void Equip(EquipLoc location, Equipment item)
         {
             if(!item.fits(location))
             {
@@ -197,47 +199,42 @@ namespace Botcraft
 
             if(equipArray[(int)location] != null)
             {
-                unequip(location);
+                Unequip(location);
             }
             equipArray[(int)location] = item;
         }
         
         //Private Methods
-        private Queue<MobCmd> getAiInput(/*TODO: Implement AI*/)
+        private Queue<MobAction> GetAiInput(/*TODO: Implement AI*/)
         {
             if (cmdQueue.Count == 0)
             {
+                Queue<MobAction> newQueue = new Queue<MobAction>();
+                newQueue.Enqueue(new MobAction());
+                newQueue.Enqueue(new MobAction(MobActEnum.Scan));
+                newQueue.Enqueue(new MobAction(MobActEnum.Pause));
 
-                Queue<MobCmd> newQueue = new Queue<MobCmd>(new[] { MobCmd.Idle, MobCmd.Scan });
                 return newQueue;
             }
             else return null;
         }
-        private void attackOrMine(int targetX, int targetY, int targetZ)
+        private void Attack(int targetX, int targetY, int targetZ)
         {
-            if(
-                targetX < 0 || targetX > Game.MAP_HEIGHT ||
-                targetY < 0 || targetY > Game.MAP_WIDTH ||
-                targetZ < 0 || targetZ > Game.MAP_DEPTH
-                ) { return; }
             if (theWorld[z].map[x - 1, y].isMovable() == false)
             {
                 if (theWorld[z].map[x - 1, y].mob != null)
                 {
-                    theWorld[z].map[x - 1, y].mob.takeDamage(this);
+                    theWorld[z].map[x - 1, y].mob.TakeDamage(this);
                     Console.Write("TODO: Attack");
                 }
-                else
-                {
-                    mine(x - 1, y, z);
-                }
+
             }
          }
-        private void mine(int targetX, int targetY, int targetZ)
+        private void Mine(int targetX, int targetY, int targetZ)
         {
-            theWorld[targetZ].map[targetX, targetY].mine(getStat(Stats.MinePower));
+            theWorld[targetZ].map[targetX, targetY].mine(GetStat(Stats.MinePower));
         }
-        private void moveTo(int newX, int newY, int newZ)
+        private void MoveTo(int newX, int newY, int newZ)
         {
             //try to move to the location
             if (theWorld[newZ].map[newX, newY].enter(this))    //returns false if space is occupied by a mob or block
@@ -247,16 +244,16 @@ namespace Botcraft
                 this.y = newY;
                 this.z = newZ;
                 if(theWorld[z].map[x,y].items.Count > 0)
-                    cmdStack.Push(MobCmd.GetItems);
+                    cmdStack.Push(new MobAction(MobActEnum.Loot));
             }
             if (theWorld[z+1].map[x,y].isMovable())
             {
-                cmdStack.Push(MobCmd.MoveDown);     //Fall if possible; 
+                cmdStack.Push(new MobAction(MobActEnum.Move, "D"));     //Fall if possible; 
             }
         }
-        private void scan()
+        private void Scan()
         {
-            int scanRadius = getStat(Stats.ScanRadius);
+            int scanRadius = GetStat(Stats.ScanRadius);
             scanData = new char[3, 2 * scanRadius + 1, 2*scanRadius+1];
             Console.WriteLine("\n--Scanning--");
             int scanX = 0;
@@ -312,36 +309,96 @@ namespace Botcraft
             Console.ResetColor();
             Console.WriteLine("--End Scan--\n");
         }
-        private void loot()
+        private void Loot()
         {
             int available;
-            ItemRecord[] blockItemArray = theWorld[z].map[x, y].items.ToArray();
-            List<ItemRecord> dropList = new List<ItemRecord>();
-            foreach (ItemRecord index in blockItemArray)
-            {
-                Console.Write(" | ");
-                available = theWorld[z].map[x, y].takeItemByItemName(index);
-                int leftovers = addItems(index.item, available);  //What happens to leftovers?
-                dropList.Add(new ItemRecord(index.item, leftovers));
-                Console.WriteLine(" | ");
-            }
-            Console.WriteLine("");
-            theWorld[z].map[x, y].cleanupItems();
-                    
+
+            Console.WriteLine("You have no loot function!");
+
         }
 
-
-
+        private void DoCmd(MobAction cmdObj)//target is X,Y,Z
+        {
+            int targetX = x + Direction.convert(cmdObj.directionString)[0];
+            int targetY = y + Direction.convert(cmdObj.directionString)[1];
+            int targetZ = z + Direction.convert(cmdObj.directionString)[2];
+            
+            //Validate Target
+            if (
+                targetX < 0 || targetX > Game.MAP_HEIGHT ||
+                targetY < 0 || targetY > Game.MAP_WIDTH ||
+                targetZ < 0 || targetZ > Game.MAP_DEPTH ||
+                cmdObj.repeat < 1
+              ) { return; }
+            if (cmdObj.repeat > 1)
+            {
+                cmdObj.repeat--;
+                PushCmd(cmdObj);
+            }
+            Console.WriteLine("{0} is executing the {1} command", name, cmdObj.cmd);
+           
+            
+            switch (cmdObj.cmd)
+            {
+                case MobActEnum.Move:
+                    if (theWorld[targetZ].map[targetX, targetY].isMovable())
+                    {
+                        MoveTo(targetX, targetY, targetZ);
+                    }
+                    break;
+                case MobActEnum.Attack:
+                    if (theWorld[targetZ].map[targetX, targetY].mob != null)
+                    {
+                        Attack(targetX, targetY, targetZ);
+                    }break;
+                case MobActEnum.Mine:
+                    if (theWorld[targetZ].map[targetX, targetY].block.id != BlockID.Air)
+                    {
+                        Mine(targetX, targetY, targetZ);
+                    }break;
+                case MobActEnum.Idle:
+                    break;
+                case MobActEnum.Scan:
+                    Scan();
+                    break;
+                case MobActEnum.Quit:
+                    break;
+                case MobActEnum.Pause:
+                    Console.WriteLine("Paused by {0}", this.name);
+                    //Console.ReadLine();
+                    Console.WriteLine("Breakpoint");
+                    break;
+                case MobActEnum.Loot:
+                    Loot();
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+        private bool TakeDamage(Mob attacker)
+        {
+            baseStats[(int)Stats.HP] -= (5 + attacker.GetStat(Stats.AttackPower) - GetStat(Stats.Armor));
+            if(baseStats[(int)Stats.HP] <= 0)
+            {
+                //Die, drop items
+                Console.WriteLine("{0} died!  Oh, no!", name);
+                return true;
+            }
+            else
+            return false;
+        }
+       /*  |-------> y+
+        *  |
+        *  |
+        *  v x+
+        *
+    
         private void doCmd(MobCmd cmd)
         {
             Console.WriteLine("{0} is executing the {1} command", name, cmd);
             MobCmd replacementCmd = MobCmd.Empty;
             
-            /*  |-------> y+
-             *  |
-             *  |
-             *  v x+
-             */
             switch (cmd)
             {
                 case MobCmd.MoveWest:
@@ -406,17 +463,6 @@ namespace Botcraft
                 doCmd( replacementCmd );
             }
         }
-        private bool takeDamage(Mob attacker)
-        {
-            baseStats[(int)Stats.HP] -= (5 + attacker.getStat(Stats.AttackPower) - getStat(Stats.Armor));
-            if(baseStats[(int)Stats.HP] <= 0)
-            {
-                //Die, drop items
-                Console.WriteLine("{0} died!  Oh, no!", name);
-                return true;
-            }
-            else
-            return false;
-        }
+        */
     }
 }

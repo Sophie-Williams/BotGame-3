@@ -28,7 +28,7 @@ namespace Botcraft
         }
 
         
-        public int takeItemByItemName(ItemRecord itemByName)
+        public int LoseItems(ItemRecord itemByName)
         {
             int output;
 
@@ -37,10 +37,37 @@ namespace Botcraft
             items.Remove(target);
             return output;
         }
-        public void giveItemRecord(ItemRecord given)
+        public void GainItems(ItemRecord itemRecord)
         {
-            items.Add(given);
-            cleanupItems();
+            GainItems(itemRecord.item, itemRecord.quantity);
+        }
+        public void GainItems(Item newItem, int quantityToAdd)
+        {
+            int leftoverItemCount = quantityToAdd;
+            while (quantityToAdd > 0)
+            {
+                // See if the BlockSpace already has that item in its items array and if there's room to stack more
+                if (items.Exists(r => (r.item != null) && (r.item.id == newItem.id) && (r.quantity < newItem.maxQuantity)))
+                {
+                    ItemRecord target = items.First(x => (x.item.id == newItem.id) && (x.quantity < newItem.maxQuantity));
+
+                    //how many more we can stack
+                    int maxToAdd = newItem.maxQuantity - target.quantity;
+
+                    //add to the stack without overflowing
+                    int deltaQ = Math.Min(quantityToAdd, maxToAdd);
+                    target.quantity += deltaQ;
+                    
+                    quantityToAdd -= deltaQ;
+                    leftoverItemCount -= deltaQ;
+                    
+                } 
+                else
+                {
+                    items.Add(new ItemRecord(newItem, 0));
+                    
+                }
+            }
         }
         public bool mine(int minePower)
         {
@@ -96,7 +123,7 @@ namespace Botcraft
         public void cleanupItems()
         {
             items.RemoveAll(r => (r.quantity == 0));
-            //TODO: stack items
+            //Consolidate stacks
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Botcraft
         public List<ItemRecord> storage;
         
 
-        public void Building()
+        public Building()
         {
             storage = new List<ItemRecord>();
 
